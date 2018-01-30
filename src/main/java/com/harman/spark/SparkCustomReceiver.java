@@ -51,7 +51,7 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 			public void call(JavaRDD<String> rdd) throws Exception {
 
 				if (rdd.count() == 0) {
-					System.out.println("RDD count is >0");
+					System.out.println("RDD count is 0");
 				} else
 					System.out.println("RDD count is >0");
 				rdd.foreach(new VoidFunction<String>() {
@@ -60,7 +60,6 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 
 					@Override
 					public void call(String s) throws Exception {
-						System.out.println("Test");
 						System.out.println(s);
 					}
 
