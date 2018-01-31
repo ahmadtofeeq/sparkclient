@@ -1,6 +1,7 @@
 package com.harman.dbinsertion;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
@@ -34,7 +35,7 @@ public class InsertIntoMongoDB {
 	 * Connection opens once only, and kept open till the Sparkclient runs
 	 */
 	public void openConnection() {
-		if (mongoClient == null){
+		if (mongoClient == null) {
 			mongoClient = new MongoClient("10.0.0.4", 27017);
 		}
 	}
@@ -45,10 +46,12 @@ public class InsertIntoMongoDB {
 			Document document = Document.parse(json.toString());
 			MongoDatabase database = mongoClient.getDatabase("DEVICE_INFO_STORE");
 			MongoCollection<Document> table = database.getCollection("SmartAudioAnalytics");
+			Date date = new Date();
+			document.append("date", date);
 			table.insertOne(document);
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("Mongo : "+e.getMessage());
+			System.out.println("Mongo : " + e.getMessage());
 		}
 	}
 

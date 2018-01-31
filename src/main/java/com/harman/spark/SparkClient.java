@@ -9,15 +9,6 @@ import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
-import org.apache.spark.streaming.scheduler.StreamingListener;
-import org.apache.spark.streaming.scheduler.StreamingListenerBatchCompleted;
-import org.apache.spark.streaming.scheduler.StreamingListenerBatchStarted;
-import org.apache.spark.streaming.scheduler.StreamingListenerBatchSubmitted;
-import org.apache.spark.streaming.scheduler.StreamingListenerOutputOperationCompleted;
-import org.apache.spark.streaming.scheduler.StreamingListenerOutputOperationStarted;
-import org.apache.spark.streaming.scheduler.StreamingListenerReceiverError;
-import org.apache.spark.streaming.scheduler.StreamingListenerReceiverStarted;
-import org.apache.spark.streaming.scheduler.StreamingListenerReceiverStopped;
 
 import com.harman.dbinsertion.InsertIntoMongoDB;
 import com.harman.dbinsertion.InsertionIntoMariaDB;
@@ -33,57 +24,11 @@ public class SparkClient implements DBkeys {
 	public static void main(String[] args) {
 		System.out.println("52.165.145.168");
 		SparkConf sparkConf = new SparkConf().setMaster("spark://10.0.0.5:7077").setAppName("SmartAudioAnalytics")
-				.set("spark.executor.memory", "1g").set("spark.cores.max", "5");
+				.set("spark.executor.memory", "1g").set("spark.cores.max", "5").set("spark.driver.cores", "2")
+				.set("spark.driver.memory", "2g");
 		System.out.println("1");
 		JavaStreamingContext ssc = new JavaStreamingContext(sparkConf, new Duration(3000));
 
-		/*
-		 * ssc.addStreamingListener(new StreamingListener() {
-		 * 
-		 * @Override public void
-		 * onReceiverStopped(StreamingListenerReceiverStopped arg0) { // TODO
-		 * Auto-generated method stub System.out.println("onReceiverStopped"); }
-		 * 
-		 * @Override public void
-		 * onReceiverStarted(StreamingListenerReceiverStarted arg0) { // TODO
-		 * Auto-generated method stub System.out.println("onReceiverStarted");
-		 * 
-		 * }
-		 * 
-		 * @Override public void onReceiverError(StreamingListenerReceiverError
-		 * arg0) { // TODO Auto-generated method stub
-		 * System.out.println("onReceiverError");
-		 * 
-		 * }
-		 * 
-		 * @Override public void
-		 * onOutputOperationStarted(StreamingListenerOutputOperationStarted
-		 * arg0) { // TODO Auto-generated method stub
-		 * System.out.println("onOutputOperationStarted");
-		 * 
-		 * }
-		 * 
-		 * @Override public void
-		 * onOutputOperationCompleted(StreamingListenerOutputOperationCompleted
-		 * arg0) { // TODO Auto-generated method stub
-		 * System.out.println("onOutputOperationCompleted");
-		 * 
-		 * }
-		 * 
-		 * @Override public void
-		 * onBatchSubmitted(StreamingListenerBatchSubmitted arg0) { // TODO
-		 * Auto-generated method stub System.out.println("onBatchSubmitted");
-		 * 
-		 * }
-		 * 
-		 * @Override public void onBatchStarted(StreamingListenerBatchStarted
-		 * arg0) { // TODO Auto-generated method stub
-		 * System.out.println("onBatchStarted"); }
-		 * 
-		 * @Override public void
-		 * onBatchCompleted(StreamingListenerBatchCompleted arg0) {
-		 * System.out.println("onBatchCompleted"); } });
-		 */
 		JavaDStream<String> JsonReq1 = ssc.socketTextStream("52.165.145.168", 9997, StorageLevels.MEMORY_AND_DISK_SER);
 		JavaDStream<String> JsonReq2 = ssc.socketTextStream("52.165.145.168", 9997, StorageLevels.MEMORY_AND_DISK_SER);
 		ArrayList<JavaDStream<String>> streamList = new ArrayList<JavaDStream<String>>();

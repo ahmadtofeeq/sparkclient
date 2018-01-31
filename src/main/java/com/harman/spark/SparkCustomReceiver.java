@@ -83,12 +83,14 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 	public void onStop() {
 		// There is nothing much to do as the thread calling receive()
 		// is designed to stop by itself isStopped() returns false
+		
+		System.out.println("onStop ");
 	}
 
 	/** Create a socket connection and receive data until receiver is stopped */
 	private void receive() {
 		Socket socket = null;
-		String userInput = null;
+		char userInput ;
 
 		try {
 			// connect to the server
@@ -97,11 +99,15 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
 			// Until stopped or connection broken continue reading
-			while (!isStopped() && (userInput = reader.readLine()) != null) {
-				System.out.println("Received data '" + userInput + "'");
-				store(userInput);
+			while (!isStopped())
+      {
+      System.out.println("Trying to fetch data ");
+      userInput = (char) reader.read();
+      System.out.println("Received data '" + userInput + "'");
+			//store(userInput);
 			}
-			reader.close();
+			System.out.println("stream stopped");
+      reader.close();
 			socket.close();
 
 			// Restart in an attempt to connect again when server is active
@@ -114,5 +120,6 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 			restart("Error receiving data", t);
 		}
 	}
+
 
 }
