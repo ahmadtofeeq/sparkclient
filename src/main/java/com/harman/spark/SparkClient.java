@@ -34,9 +34,9 @@ public class SparkClient implements DBkeys {
 		ArrayList<JavaDStream<String>> streamList = new ArrayList<JavaDStream<String>>();
 		streamList.add(JsonReq1);
 		JavaDStream<String> UnionStream = ssc.union(JsonReq2, streamList);
-
+		
 		UnionStream.foreachRDD(new VoidFunction<JavaRDD<String>>() {
-
+			
 			private static final long serialVersionUID = 1L;
 			int total = 0;
 
@@ -53,7 +53,7 @@ public class SparkClient implements DBkeys {
 					@Override
 					public void call(String s) throws Exception {
 						System.out.println(s);
-						InsertIntoMongoDB insertMongo = InsertIntoMongoDB.getInstance();
+						/*InsertIntoMongoDB insertMongo = InsertIntoMongoDB.getInstance();
 						insertMongo.openConnection();
 						insertMongo.updateCounter();
 						insertMongo.inserSingleRecordMongoDB(s);
@@ -69,14 +69,16 @@ public class SparkClient implements DBkeys {
 							}
 							insertMaria.resetFeatureCounter();
 						}
+						*/
 
 					}
 
 				});
 			}
 		});
+		System.out.println(UnionStream.count());
 		ssc.start();
-		ssc.awaitTerminationOrTimeout(Long.MAX_VALUE);
+		ssc.awaitTermination();
 	}
 
 }
