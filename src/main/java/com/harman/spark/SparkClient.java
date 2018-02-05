@@ -10,8 +10,6 @@ import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 
-import com.harman.dbinsertion.InsertIntoMongoDB;
-import com.harman.dbinsertion.InsertionIntoMariaDB;
 import com.harman.models.DBkeys;
 
 public class SparkClient implements DBkeys {
@@ -76,6 +74,9 @@ public class SparkClient implements DBkeys {
 				});
 			}
 		});
+		
+		
+		
 		System.out.println(UnionStream.count());
 		ssc.start();
 		ssc.awaitTermination();

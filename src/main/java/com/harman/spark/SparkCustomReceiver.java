@@ -4,9 +4,13 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Vector;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.Duration;
@@ -54,6 +58,7 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 					System.out.println("RDD count is 0");
 				} else
 					System.out.println("RDD count is >0");
+
 				rdd.foreach(new VoidFunction<String>() {
 
 					private static final long serialVersionUID = 1L;
@@ -83,14 +88,14 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 	public void onStop() {
 		// There is nothing much to do as the thread calling receive()
 		// is designed to stop by itself isStopped() returns false
-		
+
 		System.out.println("onStop ");
 	}
 
 	/** Create a socket connection and receive data until receiver is stopped */
 	private void receive() {
 		Socket socket = null;
-		char userInput ;
+		ArrayList<String> userInput = new ArrayList<>();
 
 		try {
 			// connect to the server
@@ -99,17 +104,19 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
 			// Until stopped or connection broken continue reading
-			while (!isStopped())
-      {
-      System.out.println("Trying to fetch data ");
-      userInput = (char) reader.read();
-      System.out.println("Received data '" + userInput + "'");
-			//store(userInput);
+			while (!isStopped()) {
+				System.out.println("Trying to fetch data ");
+				String temp = reader.readLine();
+				System.out.println("Received data '" + temp + "'");
+				if (userInput.size() > 5) {
+					System.out.println("Received data written to spark");
+					store(userInput.iterator());
+					userInput.clear();
+				}
 			}
 			System.out.println("stream stopped");
-      reader.close();
+			reader.close();
 			socket.close();
-
 			// Restart in an attempt to connect again when server is active
 			// again
 			restart("Trying to connect again");
@@ -120,6 +127,5 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 			restart("Error receiving data", t);
 		}
 	}
-
 
 }
