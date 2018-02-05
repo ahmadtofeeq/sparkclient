@@ -1,9 +1,11 @@
 package com.harman.spark;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -16,7 +18,7 @@ import org.apache.spark.streaming.receiver.Receiver;
 
 import com.harman.models.DBkeys;
 
-public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
+public class SparkCustomReceiverCopySocket extends Receiver<String> implements DBkeys {
 
 	/**
 	* 
@@ -26,7 +28,7 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 	String host = null;
 	int port = -1;
 
-	public SparkCustomReceiver(String host_, int port_) {
+	public SparkCustomReceiverCopySocket(String host_, int port_) {
 		super(StorageLevel.MEMORY_AND_DISK_2());
 		host = host_;
 		port = port_;
@@ -42,7 +44,7 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 				.set("spark.driver.memory", "2g");
 		System.out.println("1");
 		JavaStreamingContext ssc = new JavaStreamingContext(sparkConf, new Duration(3000));
-		JavaDStream<String> lines = ssc.receiverStream(new SparkCustomReceiver("52.165.145.168", 9997));
+		JavaDStream<String> lines = ssc.receiverStream(new SparkCustomReceiverCopySocket("52.165.145.168", 9997));
 		lines.foreachRDD(new VoidFunction<JavaRDD<String>>() {
 
 			private static final long serialVersionUID = 1L;
@@ -76,7 +78,15 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 		new Thread() {
 			@Override
 			public void run() {
-				receive();
+				try {
+					Socket socket = new Socket(host, port);
+					receive(socket);
+				} catch (UnknownHostException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
 			}
 		}.start();
 	}
@@ -89,8 +99,7 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 	}
 
 	/** Create a socket connection and receive data until receiver is stopped */
-	private void receive() {
-		Socket socket = null;
+	private void receive(Socket socket) {
 		String userInput = null;
 
 		try {
