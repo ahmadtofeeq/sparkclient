@@ -10,20 +10,20 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.harman.models.AppAnalyticsModel;
+import com.harman.Model.AppModel.AppAnalyticModel;
+import com.harman.Model.AppModel.DeviceAnalyticModel;
 import com.harman.models.DBkeys;
-import com.harman.models.DeviceAnalyticsModel;
 import com.harman.models.HarmanDeviceModel;
-import com.harman.models.MariaStructure;
+import com.harman.models.PRODUCT_TYPE;
 import com.harman.utils.ErrorType;
 
-public class MariaModel implements MariaStructure, DBkeys {
+public class MariaDB implements DBkeys {
 
-	static MariaModel mariaModel;
+	static MariaDB mariaModel;
 
-	public static MariaModel getInstance() {
+	public static MariaDB getInstance() {
 		if (mariaModel == null)
-			mariaModel = new MariaModel();
+			mariaModel = new MariaDB();
 		return mariaModel;
 	}
 
@@ -34,12 +34,8 @@ public class MariaModel implements MariaStructure, DBkeys {
 			return connn;
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			// STEP 3: Open a connection
 			System.out.println("Connecting to a selected database...");
 			connn = DriverManager.getConnection("jdbc:mariadb://localhost/DEVICE_INFO_STORE", "root", "");
-			// connn =
-			// DriverManager.getConnection("jdbc:mariadb://127.0.0.1/device_info_store",
-			// "root", "abcd123");
 			System.out.println("Connected database successfully...");
 		} catch (SQLException e) {
 			System.out.println("Failed to connect db");
@@ -111,64 +107,6 @@ public class MariaModel implements MariaStructure, DBkeys {
 		return response;
 	}
 
-	public ErrorType insertDeviceAnalytics(DeviceAnalyticsModel mDeviceAnalyticsModel, Connection conn) {
-		ErrorType response = ErrorType.NO_ERROR;
-		Statement stmt = null;
-		try {
-			stmt = conn.createStatement();
-			try {
-				String queryInsertNewRow = createQuery(mDeviceAnalyticsModel.getmDeviceAnaModelList(), DeviceAnalytics,
-						mDeviceAnalyticsModel.getMacaddress()).toString();
-				int result = stmt.executeUpdate(queryInsertNewRow);
-				if (result == 0)
-					response = ErrorType.ERROR_INSERTING_DB;
-			} catch (SQLException se) {
-				response = ErrorType.ERROR_INSERTING_DB;
-			}
-		} catch (Exception e) {
-			response = ErrorType.NETWORK_NOT_AVAILBLE;
-		} finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException se) {
-				response = ErrorType.ERROR_CLOSING_DB;
-				System.out.println("SQLException while closing data");
-			}
-		}
-		return response;
-	}
-
-	public ErrorType insertAppAnalytics(AppAnalyticsModel mAppAnalyticsModel, Connection conn) {
-		ErrorType response = ErrorType.NO_ERROR;
-		Statement stmt = null;
-		try {
-			stmt = conn.createStatement();
-			try {
-				String queryInsertNewRow = createQuery(mAppAnalyticsModel.getmDeviceAnaModelList(), AppAnalytics,
-						mAppAnalyticsModel.getMacaddress()).toString();
-				int result = stmt.executeUpdate(queryInsertNewRow);
-				if (result == 0)
-					response = ErrorType.ERROR_INSERTING_DB;
-			} catch (SQLException se) {
-				response = ErrorType.ERROR_INSERTING_DB;
-			}
-		} catch (Exception e) {
-			response = ErrorType.NETWORK_NOT_AVAILBLE;
-		} finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException se) {
-				response = ErrorType.ERROR_CLOSING_DB;
-				System.out.println("SQLException while closing data");
-			}
-		}
-		return response;
-	}
-
 	@SuppressWarnings("rawtypes")
 	public StringBuffer createQuery(LinkedHashMap<String, Integer> keyValueMap, String table, String macAddress) {
 		Iterator<Entry<String, Integer>> it = keyValueMap.entrySet().iterator();
@@ -194,5 +132,98 @@ public class MariaModel implements MariaStructure, DBkeys {
 
 		System.out.println(queryBuffer);
 		return queryBuffer;
+	}
+
+	public ErrorType insertAppAnalytics(AppAnalyticModel mAppAnalyticsModel, Connection conn) {
+		ErrorType response = ErrorType.NO_ERROR;
+		Statement stmt = null;
+		try {
+			stmt = conn.createStatement();
+			try {
+				String tableName = mAppAnalyticsModel.getDeviceType() == PRODUCT_TYPE.BOOMBOX ? BoomboxAppAnalytics
+						: JBLXtremeCLAppAnalytics;
+				String queryInsertNewRow = createQuery(mAppAnalyticsModel.getmDeviceAnaModelList(), tableName,
+						mAppAnalyticsModel.getMacaddress()).toString();
+				int result = stmt.executeUpdate(queryInsertNewRow);
+				if (result == 0)
+					response = ErrorType.ERROR_INSERTING_DB;
+			} catch (SQLException se) {
+				response = ErrorType.ERROR_INSERTING_DB;
+			}
+
+		} catch (Exception e) {
+			response = ErrorType.NETWORK_NOT_AVAILBLE;
+		} finally {
+			try {
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException se) {
+				response = ErrorType.ERROR_CLOSING_DB;
+				System.out.println("SQLException while closing data");
+			}
+		}
+		return response;
+	}
+
+	public ErrorType inserEmailCounter(int counter, Connection conn) {
+		ErrorType response = ErrorType.NO_ERROR;
+		Statement stmt = null;
+		try {
+			stmt = conn.createStatement();
+			try {
+				String tableName = "PowerONOFF";
+				String queryInsertNewRow = "INSERT INTO " + tableName + "( Counter ) VALUE (" + counter + ")";
+				int result = stmt.executeUpdate(queryInsertNewRow);
+				if (result == 0)
+					response = ErrorType.ERROR_INSERTING_DB;
+			} catch (SQLException se) {
+				response = ErrorType.ERROR_INSERTING_DB;
+			}
+
+		} catch (Exception e) {
+			response = ErrorType.NETWORK_NOT_AVAILBLE;
+		} finally {
+			try {
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException se) {
+				response = ErrorType.ERROR_CLOSING_DB;
+				System.out.println("SQLException while closing data");
+			}
+		}
+		return response;
+	}
+
+	public ErrorType insertDeviceAnalytics(DeviceAnalyticModel mDeviceAnalyticsModel, Connection conn) {
+		ErrorType response = ErrorType.NO_ERROR;
+		Statement stmt = null;
+		try {
+			String tableName = mDeviceAnalyticsModel.getDeviceType() == PRODUCT_TYPE.BOOMBOX ? BoomboxDeviceAnalytics
+					: JBLXtremeCLDeviceAnalytics;
+			stmt = conn.createStatement();
+			try {
+				String queryInsertNewRow = createQuery(mDeviceAnalyticsModel.getmDeviceAnaModelList(), tableName,
+						mDeviceAnalyticsModel.getMacaddress()).toString();
+				int result = stmt.executeUpdate(queryInsertNewRow);
+				if (result == 0)
+					response = ErrorType.ERROR_INSERTING_DB;
+			} catch (SQLException se) {
+				response = ErrorType.ERROR_INSERTING_DB;
+			}
+		} catch (Exception e) {
+			response = ErrorType.NETWORK_NOT_AVAILBLE;
+		} finally {
+			try {
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException se) {
+				response = ErrorType.ERROR_CLOSING_DB;
+				System.out.println("SQLException while closing data");
+			}
+		}
+		return response;
 	}
 }

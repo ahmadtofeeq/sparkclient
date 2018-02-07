@@ -15,6 +15,8 @@ import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.receiver.Receiver;
 
+import com.harman.dbinsertion.MongoDBOperator;
+import com.harman.dbinsertion.MariadbOperator;
 import com.harman.models.DBkeys;
 
 public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
@@ -48,21 +50,29 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 
 			private static final long serialVersionUID = 1L;
 
-			@Override
 			public void call(JavaRDD<String> rdd) throws Exception {
 
-				if (rdd.count() == 0) {
-					System.out.println("RDD count is 0");
-				} else
-					System.out.println("RDD count is >0");
+				final long count = rdd.count();
 
 				rdd.foreach(new VoidFunction<String>() {
 
 					private static final long serialVersionUID = 1L;
 
-					@Override
 					public void call(String s) throws Exception {
-						System.out.println(s);
+						MongoDBOperator mongoOp = MongoDBOperator.getInstance();
+						mongoOp.openConnection();
+						mongoOp.updateCounter();
+						mongoOp.inserSingleRecordMongoDB(s);
+
+						MariadbOperator mariaOp = MariadbOperator.getInstance();
+						mariaOp.insertIntoMariaDB(s);
+
+						if (mongoOp.getCounter() >= count) {
+							if (mariaOp.getFeatureCounter() > emailAlertCounter) {
+								SparkTriggerThread.SendEmail("PowerOnOffCount", mariaOp.getFeatureCounter());
+							}
+							mariaOp.resetFeatureCounter();
+						}
 					}
 
 				});
@@ -83,13 +93,11 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 		t.setPriority(Thread.MAX_PRIORITY);
 		t.start();
 		System.out.println("t1 thread priority : " + t.getPriority()); // Default
-		// new Thread(new SeperateThread());
 	}
 
 	public void onStop() {
 		// There is nothing much to do as the thread calling receive()
 		// is designed to stop by itself isStopped() returns false
-
 		System.out.println("onStop ");
 	}
 
@@ -100,17 +108,13 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 		String userInput = null;
 
 		try {
-			// connect to the server
 			socket = new Socket(host, port);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			// Until stopped or connection broken continue reading
 			while (!isStopped()) {
-				System.out.println("Trying to fetch data ");
 				userInput = reader.readLine();
-				System.out.println("Received data '" + userInput + "'");
+				System.out.println("**** Only Print - " + userInput + "\n");
 				store(userInput);
 			}
-
 			System.out.println("stream stopped");
 			reader.close();
 			socket.close();

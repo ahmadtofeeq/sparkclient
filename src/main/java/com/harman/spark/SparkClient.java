@@ -32,13 +32,12 @@ public class SparkClient implements DBkeys {
 		ArrayList<JavaDStream<String>> streamList = new ArrayList<JavaDStream<String>>();
 		streamList.add(JsonReq1);
 		JavaDStream<String> UnionStream = ssc.union(JsonReq2, streamList);
-		
+
 		UnionStream.foreachRDD(new VoidFunction<JavaRDD<String>>() {
-			
+
 			private static final long serialVersionUID = 1L;
 			int total = 0;
 
-			@Override
 			public void call(JavaRDD<String> rdd) throws Exception {
 
 				long count = rdd.count();
@@ -48,35 +47,33 @@ public class SparkClient implements DBkeys {
 
 					private static final long serialVersionUID = 1L;
 
-					@Override
 					public void call(String s) throws Exception {
 						System.out.println(s);
-						/*InsertIntoMongoDB insertMongo = InsertIntoMongoDB.getInstance();
-						insertMongo.openConnection();
-						insertMongo.updateCounter();
-						insertMongo.inserSingleRecordMongoDB(s);
-
-						InsertionIntoMariaDB insertMaria = InsertionIntoMariaDB.getInstance();
-						insertMaria.insertIntoMariaDB(s);
-
-						if (insertMongo.getCounter() >= count) {
-							if (insertMaria.getFeatureCounter() > emailAlertCounter) {
-								// send email
-								SparkTriggerThread.SendEmail("CriticalTemperatureShutDown",
-										insertMaria.getFeatureCounter());
-							}
-							insertMaria.resetFeatureCounter();
-						}
-						*/
+						/*
+						 * InsertIntoMongoDB insertMongo =
+						 * InsertIntoMongoDB.getInstance();
+						 * insertMongo.openConnection();
+						 * insertMongo.updateCounter();
+						 * insertMongo.inserSingleRecordMongoDB(s);
+						 * 
+						 * InsertionIntoMariaDB insertMaria =
+						 * InsertionIntoMariaDB.getInstance();
+						 * insertMaria.insertIntoMariaDB(s);
+						 * 
+						 * if (insertMongo.getCounter() >= count) { if
+						 * (insertMaria.getFeatureCounter() > emailAlertCounter)
+						 * { // send email SparkTriggerThread.SendEmail(
+						 * "CriticalTemperatureShutDown",
+						 * insertMaria.getFeatureCounter()); }
+						 * insertMaria.resetFeatureCounter(); }
+						 */
 
 					}
 
 				});
 			}
 		});
-		
-		
-		
+
 		System.out.println(UnionStream.count());
 		ssc.start();
 		ssc.awaitTermination();

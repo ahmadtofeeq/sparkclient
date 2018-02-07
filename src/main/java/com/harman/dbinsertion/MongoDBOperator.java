@@ -11,21 +11,21 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
-public class InsertIntoMongoDB {
+public class MongoDBOperator {
 
 	Vector<String> listofJson = new Vector<String>();
 	Object object = new Object();
-	static InsertIntoMongoDB insertIntoMongoDB = null;
+	static MongoDBOperator insertIntoMongoDB = null;
 
-	private InsertIntoMongoDB() {
+	private MongoDBOperator() {
 
 	}
 
 	private long counter;
 
-	public static InsertIntoMongoDB getInstance() {
+	public static MongoDBOperator getInstance() {
 		if (insertIntoMongoDB == null)
-			insertIntoMongoDB = new InsertIntoMongoDB();
+			insertIntoMongoDB = new MongoDBOperator();
 		return insertIntoMongoDB;
 	}
 

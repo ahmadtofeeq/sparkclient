@@ -5,64 +5,64 @@ import java.sql.Connection;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.harman.models.AppAnalyticsModel;
+import com.harman.Model.AppModel.AppAnalyticModel;
+import com.harman.Model.AppModel.DeviceAnalyticModel;
 import com.harman.models.DBkeys;
-import com.harman.models.DeviceAnalyticsModel;
 import com.harman.models.HarmanDeviceModel;
 import com.harman.utils.ErrorType;
 import com.harman.utils.HarmanParser;
 
-public class InsertionIntoMariaDB implements DBkeys {
+public class MariadbOperator implements DBkeys {
 
-	private InsertionIntoMariaDB() {
+	private MariadbOperator() {
 
 	}
 
-	static InsertionIntoMariaDB isInsertionIntoMariaDB = null;
+	static MariadbOperator isInsertionIntoMariaDB = null;
 
-	public static InsertionIntoMariaDB getInstance() {
+	public static MariadbOperator getInstance() {
 		if (isInsertionIntoMariaDB == null)
-			isInsertionIntoMariaDB = new InsertionIntoMariaDB();
+			isInsertionIntoMariaDB = new MariadbOperator();
 		return isInsertionIntoMariaDB;
 	}
 
 	private int featureCounter = 0;
 
 	public String insertIntoMariaDB(String record) {
-		System.out.println("****************************** Inserting to mariaDB");
 		ErrorType errorType = ErrorType.NO_ERROR;
 		JSONObject response = new JSONObject();
 		try {
 			JSONObject jsonObject = new JSONObject(record);
-			MariaModel mariaModel = MariaModel.getInstance();
+			MariaDB mariaModel = MariaDB.getInstance();
 			Connection connection = mariaModel.openConnection();
 			HarmanParser harmanParser = new HarmanParser();
 			HarmanDeviceModel deviceModel = null;
 			try {
+
 				deviceModel = harmanParser.getParseHarmanDevice(jsonObject.getJSONObject(harmanDevice));
 				errorType = mariaModel.insertDeviceModel(deviceModel, connection);
-				//System.out.println(errorType.name());
+				System.out.println(errorType.name());
 			} catch (JSONException e) {
 				errorType = ErrorType.INVALID_JSON;
 			}
 
 			try {
-				DeviceAnalyticsModel deviceAnalyticsModel = harmanParser.getParseDeviceAnalyticsModel(
-						jsonObject.getJSONObject(DeviceAnalytics), deviceModel.getMacAddress());
+				DeviceAnalyticModel deviceAnalyticsModel = harmanParser.parseDeviceAnalyticsModel(
+						jsonObject.getJSONObject(DeviceAnalytics), deviceModel.getMacAddress(),
+						deviceModel.getProductId());
 				errorType = mariaModel.insertDeviceAnalytics(deviceAnalyticsModel, connection);
-				
-				updateFeatureCounter(deviceAnalyticsModel.getmDeviceAnaModelList().get(CriticalTemperatureShutDown));
-				
-				//System.out.println(errorType.name());
+				System.out.println(errorType.name());
 			} catch (JSONException e) {
 				errorType = ErrorType.INVALID_JSON;
 			}
 
 			try {
-				AppAnalyticsModel appAnalyticsModel = harmanParser
-						.getParseAppAnalyticsModel(jsonObject.getJSONObject(AppAnalytics), deviceModel.getMacAddress());
+				AppAnalyticModel appAnalyticsModel = harmanParser.parseAppAnalyticsModel(
+						jsonObject.getJSONObject(AppAnalytics), deviceModel.getMacAddress(),
+						deviceModel.getProductId());
+				updateFeatureCounter(appAnalyticsModel.getmDeviceAnaModelList().get(PowerOnOffCount));
 				errorType = mariaModel.insertAppAnalytics(appAnalyticsModel, connection);
-				//System.out.println(errorType.name());
+				System.out.println(errorType.name());
 			} catch (JSONException e) {
 				errorType = ErrorType.INVALID_JSON;
 			}
@@ -82,10 +82,7 @@ public class InsertionIntoMariaDB implements DBkeys {
 			response.put("cmd", "UpdateSmartAudioAnalyticsRes");
 			System.out.println("fail to parse");
 		} finally {
-			/*
-			 * MariaModel mariaModel = MariaModel.getInstance();
-			 * mariaModel.closeConnection();
-			 */
+			MariaDB.getInstance().closeConnection();
 		}
 		System.out.println(errorType.name());
 		return response.toString();
