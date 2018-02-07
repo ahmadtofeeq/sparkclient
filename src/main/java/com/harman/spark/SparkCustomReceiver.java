@@ -1,3 +1,4 @@
+
 package com.harman.spark;
 
 import java.io.BufferedReader;
@@ -73,12 +74,16 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 
 	public void onStart() {
 		// Start the thread that receives data over a connection
-		new Thread() {
+		Thread t = new Thread() {
 			@Override
 			public void run() {
 				receive();
 			}
-		}.start();
+		};
+		t.setPriority(Thread.MAX_PRIORITY);
+		t.start();
+		System.out.println("t1 thread priority : " + t.getPriority()); // Default
+		// new Thread(new SeperateThread());
 	}
 
 	public void onStop() {
@@ -88,6 +93,7 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 		System.out.println("onStop ");
 	}
 
+	// static Socket socket = null;
 	/** Create a socket connection and receive data until receiver is stopped */
 	private void receive() {
 		Socket socket = null;
@@ -104,17 +110,18 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 				System.out.println("Received data '" + userInput + "'");
 				store(userInput);
 			}
+
 			System.out.println("stream stopped");
 			reader.close();
 			socket.close();
 			// Restart in an attempt to connect again when server is active
 			// again
-			restart("Trying to connect again");
+			System.out.println("Trying to connect again");
 		} catch (ConnectException ce) {
 			// restart if could not connect to server
-			restart("Could not connect", ce);
+			System.out.println("Could not connect");
 		} catch (Throwable t) {
-			restart("Error receiving data", t);
+			System.out.println("Error receiving data");
 		}
 	}
 
