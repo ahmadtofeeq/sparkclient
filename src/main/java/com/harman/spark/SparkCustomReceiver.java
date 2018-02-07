@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -45,8 +46,14 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 				.set("spark.driver.memory", "2g");
 		System.out.println("1");
 		JavaStreamingContext ssc = new JavaStreamingContext(sparkConf, new Duration(3000));
-		JavaDStream<String> lines = ssc.receiverStream(new SparkCustomReceiver("52.165.145.168", 9997));
-		lines.foreachRDD(new VoidFunction<JavaRDD<String>>() {
+		JavaDStream<String> socket_one = ssc.receiverStream(new SparkCustomReceiver("52.165.145.168", 9997));
+		JavaDStream<String> socket_two = ssc.receiverStream(new SparkCustomReceiver("52.165.145.168", 9997));
+
+		ArrayList<JavaDStream<String>> streamList = new ArrayList<JavaDStream<String>>();
+		streamList.add(socket_two);
+		JavaDStream<String> UnionStream = ssc.union(socket_one, streamList);
+
+		UnionStream.foreachRDD(new VoidFunction<JavaRDD<String>>() {
 
 			private static final long serialVersionUID = 1L;
 
@@ -115,11 +122,9 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 				System.out.println("**** Only Print - " + userInput + "\n");
 				store(userInput);
 			}
-			System.out.println("stream stopped");
+			System.out.println("Stream stopped");
 			reader.close();
 			socket.close();
-			// Restart in an attempt to connect again when server is active
-			// again
 			System.out.println("Trying to connect again");
 		} catch (ConnectException ce) {
 			// restart if could not connect to server

@@ -35,12 +35,12 @@ public class MariaDB implements DBkeys {
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
 			System.out.println("Connecting to a selected database...");
-			connn = DriverManager.getConnection("jdbc:mariadb://localhost/DEVICE_INFO_STORE", "root", "");
+			connn = DriverManager.getConnection("jdbc:mariadb://10.0.0.5/DEVICE_INFO_STORE", "root", "");
 			System.out.println("Connected database successfully...");
 		} catch (SQLException e) {
-			System.out.println("Failed to connect db");
+			System.out.println("SQLException " + e.getMessage());
 		} catch (Exception e) {
-			System.out.println("Failed to connect db");
+			System.out.println("Exception " + e.getMessage());
 		}
 		return connn;
 	}
@@ -163,6 +163,7 @@ public class MariaDB implements DBkeys {
 				System.out.println("SQLException while closing data");
 			}
 		}
+		System.out.println(response.toString() + " insertAppAnalytics ");
 		return response;
 	}
 
@@ -224,6 +225,7 @@ public class MariaDB implements DBkeys {
 				System.out.println("SQLException while closing data");
 			}
 		}
+		System.out.println(response.toString() + " insertDeviceAnalytics ");
 		return response;
 	}
 }

@@ -80,7 +80,7 @@ public class MariadbOperator implements DBkeys {
 		} catch (Exception e) {
 			response.put("Status", 0);
 			response.put("cmd", "UpdateSmartAudioAnalyticsRes");
-			System.out.println("fail to parse");
+			System.out.println("fail to parse" + e.getMessage());
 		} finally {
 			MariaDB.getInstance().closeConnection();
 		}
