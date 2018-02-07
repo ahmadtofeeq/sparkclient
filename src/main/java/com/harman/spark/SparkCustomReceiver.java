@@ -47,13 +47,16 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 		System.out.println("1");
 		JavaStreamingContext ssc = new JavaStreamingContext(sparkConf, new Duration(3000));
 		JavaDStream<String> socket_one = ssc.receiverStream(new SparkCustomReceiver("52.165.145.168", 9997));
-		JavaDStream<String> socket_two = ssc.receiverStream(new SparkCustomReceiver("52.165.145.168", 9997));
+		/*
+		 * JavaDStream<String> socket_two = ssc.receiverStream(new
+		 * SparkCustomReceiver("52.165.145.168", 9997));
+		 * 
+		 * ArrayList<JavaDStream<String>> streamList = new
+		 * ArrayList<JavaDStream<String>>(); streamList.add(socket_two);
+		 * JavaDStream<String> UnionStream = ssc.union(socket_one, streamList);
+		 */
 
-		ArrayList<JavaDStream<String>> streamList = new ArrayList<JavaDStream<String>>();
-		streamList.add(socket_two);
-		JavaDStream<String> UnionStream = ssc.union(socket_one, streamList);
-
-		UnionStream.foreachRDD(new VoidFunction<JavaRDD<String>>() {
+		socket_one.foreachRDD(new VoidFunction<JavaRDD<String>>() {
 
 			private static final long serialVersionUID = 1L;
 
