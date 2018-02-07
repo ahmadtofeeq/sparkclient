@@ -50,6 +50,7 @@ public class MariaDB implements DBkeys {
 			if (connn != null) {
 				connn.close();
 			}
+			connn=null;
 		} catch (SQLException se) {
 			se.printStackTrace();
 		}
