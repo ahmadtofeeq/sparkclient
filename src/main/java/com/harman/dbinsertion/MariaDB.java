@@ -30,7 +30,7 @@ public class MariaDB implements DBkeys {
 	Connection connn = null;
 
 	public Connection openConnection() {
-		if (connn == null)
+		if (connn != null)
 			return connn;
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");

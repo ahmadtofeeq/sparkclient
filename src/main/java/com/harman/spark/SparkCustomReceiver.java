@@ -5,7 +5,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.Socket;
-import java.util.ArrayList;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -16,8 +15,8 @@ import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.receiver.Receiver;
 
-import com.harman.dbinsertion.MongoDBOperator;
 import com.harman.dbinsertion.MariadbOperator;
+import com.harman.dbinsertion.MongoDBOperator;
 import com.harman.models.DBkeys;
 
 public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
