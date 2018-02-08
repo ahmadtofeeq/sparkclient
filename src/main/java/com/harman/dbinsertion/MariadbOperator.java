@@ -41,7 +41,7 @@ public class MariadbOperator implements DBkeys {
 
 				deviceModel = harmanParser.getParseHarmanDevice(jsonObject.getJSONObject(harmanDevice));
 				errorType = mariaModel.insertDeviceModel(deviceModel, connection);
-				System.out.println(errorType.name());
+				print("Inserted into harmanDevice Error Type =" + errorType.toString());
 			} catch (JSONException e) {
 				errorType = ErrorType.INVALID_JSON;
 			}
@@ -50,8 +50,16 @@ public class MariadbOperator implements DBkeys {
 				DeviceAnalyticModel deviceAnalyticsModel = harmanParser.parseDeviceAnalyticsModel(
 						jsonObject.getJSONObject(DeviceAnalytics), deviceModel.getMacAddress(),
 						deviceModel.getProductId());
+				try {
+					int num = deviceAnalyticsModel.getmDeviceAnaModelList().get(PowerOnOffCount) != null
+							? deviceAnalyticsModel.getmDeviceAnaModelList().get(PowerOnOffCount)
+							: deviceAnalyticsModel.getmDeviceAnaModelList().get("PowerONCount");
+					updateFeatureCounter(num);
+				} catch (Exception e) {
+					print("Feature counter failed.");
+				}
 				errorType = mariaModel.insertDeviceAnalytics(deviceAnalyticsModel, connection);
-				System.out.println(errorType.name());
+				print("Inserted into DeviceAnalytics Error Type =" + errorType.toString());
 			} catch (JSONException e) {
 				errorType = ErrorType.INVALID_JSON;
 			}
@@ -60,9 +68,8 @@ public class MariadbOperator implements DBkeys {
 				AppAnalyticModel appAnalyticsModel = harmanParser.parseAppAnalyticsModel(
 						jsonObject.getJSONObject(AppAnalytics), deviceModel.getMacAddress(),
 						deviceModel.getProductId());
-				updateFeatureCounter(appAnalyticsModel.getmDeviceAnaModelList().get(PowerOnOffCount));
 				errorType = mariaModel.insertAppAnalytics(appAnalyticsModel, connection);
-				System.out.println(errorType.name());
+				print("Inserted into AppAnalytics Error Type =" + errorType.toString());
 			} catch (JSONException e) {
 				errorType = ErrorType.INVALID_JSON;
 			}
@@ -80,7 +87,6 @@ public class MariadbOperator implements DBkeys {
 		} catch (Exception e) {
 			response.put("Status", 0);
 			response.put("cmd", "UpdateSmartAudioAnalyticsRes");
-			System.out.println("fail to parse" + e.getMessage());
 		} finally {
 			MariaDB.getInstance().closeConnection();
 		}
@@ -98,6 +104,10 @@ public class MariadbOperator implements DBkeys {
 
 	public void resetFeatureCounter() {
 		featureCounter = 0;
+	}
+
+	public void print(String message) {
+		System.out.println(message);
 	}
 
 }

@@ -49,25 +49,6 @@ public class SparkClient implements DBkeys {
 
 					public void call(String s) throws Exception {
 						System.out.println(s);
-						/*
-						 * InsertIntoMongoDB insertMongo =
-						 * InsertIntoMongoDB.getInstance();
-						 * insertMongo.openConnection();
-						 * insertMongo.updateCounter();
-						 * insertMongo.inserSingleRecordMongoDB(s);
-						 * 
-						 * InsertionIntoMariaDB insertMaria =
-						 * InsertionIntoMariaDB.getInstance();
-						 * insertMaria.insertIntoMariaDB(s);
-						 * 
-						 * if (insertMongo.getCounter() >= count) { if
-						 * (insertMaria.getFeatureCounter() > emailAlertCounter)
-						 * { // send email SparkTriggerThread.SendEmail(
-						 * "CriticalTemperatureShutDown",
-						 * insertMaria.getFeatureCounter()); }
-						 * insertMaria.resetFeatureCounter(); }
-						 */
-
 					}
 
 				});

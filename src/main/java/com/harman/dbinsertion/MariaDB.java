@@ -125,7 +125,6 @@ public class MariaDB implements DBkeys {
 				bufferKey.append(pair.getKey());
 				bufferValue.append(pair.getValue());
 			}
-			System.out.println(pair.getKey() + " = " + pair.getValue());
 			it.remove(); // avoids a ConcurrentModificationException
 		}
 		queryBuffer.append("INSERT INTO " + table + "(harmanDevice_Id," + bufferKey + ") VALUE ( '" + macAddress + "',"
