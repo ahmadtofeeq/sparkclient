@@ -21,7 +21,7 @@ public class SparkTriggerThread implements Runnable, Serializable {
 
 	public static void SendEmail(String feature, int value) {
 
-		new Thread(new SparkTriggerThread(feature, value)).start();
+		// new Thread(new SparkTriggerThread(feature, value)).start();
 
 	}
 

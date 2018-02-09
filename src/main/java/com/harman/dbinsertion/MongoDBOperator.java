@@ -11,7 +11,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
-public class MongoDBOperator {
+public class MongoDBOperator extends SparkUtils{
 
 	Vector<String> listofJson = new Vector<String>();
 	Object object = new Object();
@@ -51,7 +51,7 @@ public class MongoDBOperator {
 			table.insertOne(document);
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("Mongo : " + e.getMessage());
+			print("Mongo : " + e.getMessage());
 		}
 	}
 

@@ -39,22 +39,13 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 
 	@SuppressWarnings("resource")
 	public static void main(String[] args) {
-		System.out.println("52.165.145.168");
+		
 		SparkConf sparkConf = new SparkConf().setMaster("spark://10.0.0.5:7077").setAppName("SmartAudioAnalytics")
 				.set("spark.executor.memory", "1g").set("spark.cores.max", "5").set("spark.driver.cores", "2")
 				.set("spark.driver.memory", "2g");
 		System.out.println("1");
-		JavaStreamingContext ssc = new JavaStreamingContext(sparkConf, new Duration(3000));
+		JavaStreamingContext ssc = new JavaStreamingContext(sparkConf, new Duration(1000));
 		JavaDStream<String> socket_one = ssc.receiverStream(new SparkCustomReceiver("52.165.145.168", 9997));
-		/*
-		 * JavaDStream<String> socket_two = ssc.receiverStream(new
-		 * SparkCustomReceiver("52.165.145.168", 9997));
-		 * 
-		 * ArrayList<JavaDStream<String>> streamList = new
-		 * ArrayList<JavaDStream<String>>(); streamList.add(socket_two);
-		 * JavaDStream<String> UnionStream = ssc.union(socket_one, streamList);
-		 */
-
 		socket_one.foreachRDD(new VoidFunction<JavaRDD<String>>() {
 
 			private static final long serialVersionUID = 1L;
@@ -68,6 +59,11 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 					private static final long serialVersionUID = 1L;
 
 					public void call(String s) throws Exception {
+						try {
+							System.out.println(Thread.currentThread().getId());
+						} catch (Exception e) {
+							System.out.println("Unable to get thread id.");
+						}
 						MongoDBOperator mongoOp = MongoDBOperator.getInstance();
 						mongoOp.openConnection();
 						mongoOp.updateCounter();
@@ -121,7 +117,7 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			while (!isStopped()) {
 				userInput = reader.readLine();
-				System.out.println("**** Only Print - " + userInput + "\n");
+				// System.out.println("**** Only Print - " + userInput + "\n");
 				store(userInput);
 			}
 			System.out.println("Stream stopped");

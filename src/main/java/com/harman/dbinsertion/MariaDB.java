@@ -17,7 +17,7 @@ import com.harman.models.HarmanDeviceModel;
 import com.harman.models.PRODUCT_TYPE;
 import com.harman.utils.ErrorType;
 
-public class MariaDB implements DBkeys {
+public class MariaDB extends SparkUtils implements DBkeys {
 
 	static MariaDB mariaModel;
 
@@ -34,13 +34,13 @@ public class MariaDB implements DBkeys {
 			return connn;
 		try {
 			Class.forName("org.mariadb.jdbc.Driver");
-			System.out.println("Connecting to a selected database...");
+			print("Connecting to a selected database...");
 			connn = DriverManager.getConnection("jdbc:mariadb://10.0.0.5/DEVICE_INFO_STORE", "root", "");
-			System.out.println("Connected database successfully...");
+			print("Connected database successfully...");
 		} catch (SQLException e) {
-			System.out.println("SQLException " + e.getMessage());
+			print("SQLException " + e.getMessage());
 		} catch (Exception e) {
-			System.out.println("Exception " + e.getMessage());
+			print("Exception " + e.getMessage());
 		}
 		return connn;
 	}
@@ -50,7 +50,7 @@ public class MariaDB implements DBkeys {
 			if (connn != null) {
 				connn.close();
 			}
-			connn=null;
+			connn = null;
 		} catch (SQLException se) {
 			se.printStackTrace();
 		}
@@ -102,7 +102,7 @@ public class MariaDB implements DBkeys {
 				}
 			} catch (SQLException se) {
 				response = ErrorType.ERROR_CLOSING_DB;
-				System.out.println("SQLException while closing data");
+				print("SQLException while closing data");
 			}
 		}
 		return response;
@@ -130,7 +130,7 @@ public class MariaDB implements DBkeys {
 		queryBuffer.append("INSERT INTO " + table + "(harmanDevice_Id," + bufferKey + ") VALUE ( '" + macAddress + "',"
 				+ bufferValue + " )");
 
-		System.out.println(queryBuffer);
+		print(queryBuffer.toString());
 		return queryBuffer;
 	}
 
@@ -160,10 +160,10 @@ public class MariaDB implements DBkeys {
 				}
 			} catch (SQLException se) {
 				response = ErrorType.ERROR_CLOSING_DB;
-				System.out.println("SQLException while closing data");
+				print("SQLException while closing data");
 			}
 		}
-		System.out.println(response.toString() + " insertAppAnalytics ");
+		print(response.toString() + " insertAppAnalytics ");
 		return response;
 	}
 
@@ -191,7 +191,7 @@ public class MariaDB implements DBkeys {
 				}
 			} catch (SQLException se) {
 				response = ErrorType.ERROR_CLOSING_DB;
-				System.out.println("SQLException while closing data");
+				print("SQLException while closing data");
 			}
 		}
 		return response;
@@ -222,10 +222,10 @@ public class MariaDB implements DBkeys {
 				}
 			} catch (SQLException se) {
 				response = ErrorType.ERROR_CLOSING_DB;
-				System.out.println("SQLException while closing data");
+				print("SQLException while closing data");
 			}
 		}
-		System.out.println(response.toString() + " insertDeviceAnalytics ");
+		print(response.toString() + " insertDeviceAnalytics ");
 		return response;
 	}
 }

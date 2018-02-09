@@ -12,7 +12,7 @@ import com.harman.models.HarmanDeviceModel;
 import com.harman.utils.ErrorType;
 import com.harman.utils.HarmanParser;
 
-public class MariadbOperator implements DBkeys {
+public class MariadbOperator extends SparkUtils implements DBkeys {
 
 	private MariadbOperator() {
 
@@ -90,7 +90,7 @@ public class MariadbOperator implements DBkeys {
 		} finally {
 			MariaDB.getInstance().closeConnection();
 		}
-		System.out.println(errorType.name());
+		print(errorType.name());
 		return response.toString();
 	}
 
@@ -106,8 +106,5 @@ public class MariadbOperator implements DBkeys {
 		featureCounter = 0;
 	}
 
-	public void print(String message) {
-		System.out.println(message);
-	}
 
 }
