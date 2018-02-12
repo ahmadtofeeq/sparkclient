@@ -42,7 +42,7 @@ public class MongoDBOperator extends SparkUtils{
 
 	public void inserSingleRecordMongoDB(String json) {
 		try {
-			System.out.println("*************Inserting into mongo");
+			//System.out.println("*************Inserting into mongo");
 			Document document = Document.parse(json.toString());
 			MongoDatabase database = mongoClient.getDatabase("DEVICE_INFO_STORE");
 			MongoCollection<Document> table = database.getCollection("SmartAudioAnalytics");

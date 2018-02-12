@@ -39,9 +39,9 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 
 	@SuppressWarnings("resource")
 	public static void main(String[] args) {
-		
+
 		SparkConf sparkConf = new SparkConf().setMaster("spark://10.0.0.5:7077").setAppName("SmartAudioAnalytics")
-				.set("spark.executor.memory", "1g").set("spark.cores.max", "5").set("spark.driver.cores", "2")
+				.set("spark.executor.memory", "1g").set("spark.cores.max", "9").set("spark.driver.cores", "2")
 				.set("spark.driver.memory", "2g");
 		System.out.println("1");
 		JavaStreamingContext ssc = new JavaStreamingContext(sparkConf, new Duration(1000));
