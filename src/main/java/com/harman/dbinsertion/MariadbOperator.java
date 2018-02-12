@@ -1,6 +1,8 @@
 package com.harman.dbinsertion;
 
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -106,5 +108,43 @@ public class MariadbOperator extends SparkUtils implements DBkeys {
 		featureCounter = 0;
 	}
 
+	public void putPerIntervalCriticalTempShutdown(long count) {
+		ErrorType response = ErrorType.NO_ERROR;
+		MariaDB mariaModel = MariaDB.getInstance();
+		Connection connection = mariaModel.openConnection();
+		Statement stmt = null;
+		try {
+			stmt = connection.createStatement();
+			try {
+
+				String query = "INSERT INTO BatchCriticalTempShutDownTable (CriticalTempshutDown) VALUE(" + count + ")";
+				System.out.println(query);
+				int result = stmt.executeUpdate(query);
+				if (result == 0)
+					response = ErrorType.ERROR_INSERTING_DB;
+				else {
+					System.out.println("Critical Temperature shutdown count inserted to DB");
+				}
+			} catch (SQLException se) {
+				response = ErrorType.ERROR_INSERTING_DB;
+			}
+		} catch (Exception e) {
+			response = ErrorType.NETWORK_NOT_AVAILBLE;
+		} finally {
+			try {
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException se) {
+				response = ErrorType.ERROR_CLOSING_DB;
+				System.out.println("SQLException while closing data");
+			}
+			
+			mariaModel.closeConnection();
+
+		}
+		
+		System.out.println("Response is : " + response);
+	}
 
 }
