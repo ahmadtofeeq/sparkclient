@@ -56,10 +56,11 @@ public class MariaDB extends SparkUtils implements DBkeys {
 		}
 	}
 
-	public ErrorType insertDeviceModel(HarmanDeviceModel mHarmanDeviceModel, Connection conn) {
+	public ErrorType insertDeviceModel(HarmanDeviceModel mHarmanDeviceModel) {
 		ErrorType response = ErrorType.NO_ERROR;
 		Statement stmt = null;
 		try {
+			Connection conn = MariaDB.getInstance().openConnection();
 			stmt = conn.createStatement();
 			String query = "select * from " + harmanDevice + " where " + macAddress + " = " + "'"
 					+ mHarmanDeviceModel.getMacAddress() + "'";
@@ -104,6 +105,7 @@ public class MariaDB extends SparkUtils implements DBkeys {
 				response = ErrorType.ERROR_CLOSING_DB;
 				print("SQLException while closing data");
 			}
+			MariaDB.getInstance().openConnection();
 		}
 		return response;
 	}
@@ -134,10 +136,11 @@ public class MariaDB extends SparkUtils implements DBkeys {
 		return queryBuffer;
 	}
 
-	public ErrorType insertAppAnalytics(AppAnalyticModel mAppAnalyticsModel, Connection conn) {
+	public ErrorType insertAppAnalytics(AppAnalyticModel mAppAnalyticsModel) {
 		ErrorType response = ErrorType.NO_ERROR;
 		Statement stmt = null;
 		try {
+			Connection conn = MariaDB.getInstance().openConnection();
 			stmt = conn.createStatement();
 			try {
 				String tableName = mAppAnalyticsModel.getDeviceType() == PRODUCT_TYPE.BOOMBOX ? BoomboxAppAnalytics
@@ -162,6 +165,7 @@ public class MariaDB extends SparkUtils implements DBkeys {
 				response = ErrorType.ERROR_CLOSING_DB;
 				print("SQLException while closing data");
 			}
+			MariaDB.getInstance().closeConnection();
 		}
 		print(response.toString() + " insertAppAnalytics ");
 		return response;
@@ -197,10 +201,11 @@ public class MariaDB extends SparkUtils implements DBkeys {
 		return response;
 	}
 
-	public ErrorType insertDeviceAnalytics(DeviceAnalyticModel mDeviceAnalyticsModel, Connection conn) {
+	public ErrorType insertDeviceAnalytics(DeviceAnalyticModel mDeviceAnalyticsModel) {
 		ErrorType response = ErrorType.NO_ERROR;
 		Statement stmt = null;
 		try {
+			Connection conn = MariaDB.getInstance().openConnection();
 			String tableName = mDeviceAnalyticsModel.getDeviceType() == PRODUCT_TYPE.BOOMBOX ? BoomboxDeviceAnalytics
 					: JBLXtremeCLDeviceAnalytics;
 			stmt = conn.createStatement();
@@ -224,6 +229,7 @@ public class MariaDB extends SparkUtils implements DBkeys {
 				response = ErrorType.ERROR_CLOSING_DB;
 				print("SQLException while closing data");
 			}
+			MariaDB.getInstance().closeConnection();
 		}
 		print(response.toString() + " insertDeviceAnalytics ");
 		return response;

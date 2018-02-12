@@ -36,13 +36,11 @@ public class MariadbOperator extends SparkUtils implements DBkeys {
 		try {
 			JSONObject jsonObject = new JSONObject(record);
 			MariaDB mariaModel = MariaDB.getInstance();
-			Connection connection = mariaModel.openConnection();
 			HarmanParser harmanParser = new HarmanParser();
 			HarmanDeviceModel deviceModel = null;
 			try {
-
 				deviceModel = harmanParser.getParseHarmanDevice(jsonObject.getJSONObject(harmanDevice));
-				errorType = mariaModel.insertDeviceModel(deviceModel, connection);
+				errorType = mariaModel.insertDeviceModel(deviceModel);
 				print("Inserted into harmanDevice Error Type =" + errorType.toString());
 			} catch (JSONException e) {
 				errorType = ErrorType.INVALID_JSON;
@@ -60,7 +58,7 @@ public class MariadbOperator extends SparkUtils implements DBkeys {
 				} catch (Exception e) {
 					print("Feature counter failed.");
 				}
-				errorType = mariaModel.insertDeviceAnalytics(deviceAnalyticsModel, connection);
+				errorType = mariaModel.insertDeviceAnalytics(deviceAnalyticsModel);
 				print("Inserted into DeviceAnalytics Error Type =" + errorType.toString());
 			} catch (JSONException e) {
 				errorType = ErrorType.INVALID_JSON;
@@ -70,7 +68,7 @@ public class MariadbOperator extends SparkUtils implements DBkeys {
 				AppAnalyticModel appAnalyticsModel = harmanParser.parseAppAnalyticsModel(
 						jsonObject.getJSONObject(AppAnalytics), deviceModel.getMacAddress(),
 						deviceModel.getProductId());
-				errorType = mariaModel.insertAppAnalytics(appAnalyticsModel, connection);
+				errorType = mariaModel.insertAppAnalytics(appAnalyticsModel);
 				print("Inserted into AppAnalytics Error Type =" + errorType.toString());
 			} catch (JSONException e) {
 				errorType = ErrorType.INVALID_JSON;
@@ -139,11 +137,11 @@ public class MariadbOperator extends SparkUtils implements DBkeys {
 				response = ErrorType.ERROR_CLOSING_DB;
 				System.out.println("SQLException while closing data");
 			}
-			
+
 			mariaModel.closeConnection();
 
 		}
-		
+
 		System.out.println("Response is : " + response);
 	}
 
