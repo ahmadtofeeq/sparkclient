@@ -19,6 +19,8 @@ public class MariadbOperator extends SparkUtils implements DBkeys {
 	private MariadbOperator() {
 
 	}
+	
+	
 
 	static MariadbOperator isInsertionIntoMariaDB = null;
 
