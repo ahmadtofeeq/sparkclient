@@ -66,8 +66,8 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 					@Override
 					public Boolean call(String v1) throws Exception {
 
-						JSONObject jsonObject = new JSONObject();
-
+						JSONObject jsonObject = new JSONObject(v1);
+						
 						jsonObject = jsonObject.getJSONObject("DeviceAnalytics");
 						String nextKey = jsonObject.isNull("PowerONCount") ? "PowerOnOffCount" : "PowerONCount";
 						System.out.println(nextKey);
