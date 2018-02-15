@@ -83,18 +83,18 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 				});
 				long startime = System.currentTimeMillis();
 				
-				rdd.reduce(new Function2<String, String, String>() {
-					/**
-					 * 
-					 */
-					private static final long serialVersionUID = -1009730785434732391L;
-
-					@Override
-					public String call(String v1, String v2) throws Exception {
-						// TODO Auto-generated method stub
-						return null;
-					}
-				});
+//				rdd.reduce(new Function2<String, String, String>() {
+//					/**
+//					 * 
+//					 */
+//					private static final long serialVersionUID = -1009730785434732391L;
+//
+//					@Override
+//					public String call(String v1, String v2) throws Exception {
+//						// TODO Auto-generated method stub
+//						return null;
+//					}
+//				});
 
 				filterrdd.foreach(new VoidFunction<String>() {
 					private static final long serialVersionUID = 1L;
