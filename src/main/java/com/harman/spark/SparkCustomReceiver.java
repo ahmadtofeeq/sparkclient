@@ -9,6 +9,7 @@ import java.net.Socket;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.Duration;
@@ -56,12 +57,14 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 			public void call(JavaRDD<String> rdd) throws Exception {
 
 				final long count = rdd.count();
+
 				JavaRDD<String> filterrdd = rdd.filter(new Function<String, Boolean>() {
 
 					/**
 					 * 
 					 */
-					private static final long serialVersionUID = 1L;
+
+					private static final long serialVersionUID = -1009730785434732391L;
 
 					@Override
 					public Boolean call(String v1) throws Exception {
@@ -78,13 +81,27 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 						return jsonObject.getInt(nextKey) > 5;
 					}
 				});
+				long startime = System.currentTimeMillis();
+				
+				rdd.reduce(new Function2<String, String, String>() {
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = -1009730785434732391L;
+
+					@Override
+					public String call(String v1, String v2) throws Exception {
+						// TODO Auto-generated method stub
+						return null;
+					}
+				});
 
 				filterrdd.foreach(new VoidFunction<String>() {
 					private static final long serialVersionUID = 1L;
 
 					@Override
 					public void call(String t) throws Exception {
-						System.out.println("Entering data to Email counter "+t);
+						System.out.println("Entering data to Email counter " + t);
 						JSONObject jsonObject = new JSONObject(t);
 						jsonObject = jsonObject.getJSONObject("DeviceAnalytics");
 						String nextKey = jsonObject.isNull("PowerONCount") ? "PowerOnOffCount" : "PowerONCount";
@@ -106,23 +123,15 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 						}
 						MongoDBOperator mongoOp = MongoDBOperator.getInstance();
 						mongoOp.openConnection();
-						// mongoOp.updateCounter();
 						mongoOp.inserSingleRecordMongoDB(s);
 
 						MariadbOperator mariaOp = MariadbOperator.getInstance();
 						mariaOp.insertIntoMariaDB(s);
-
-						// if (mongoOp.getCounter() >= count) {
-						// if (mariaOp.getFeatureCounter() > emailAlertCounter)
-						// {
-						// SparkTriggerThread.SendEmail("PowerOnOffCount",
-						// mariaOp.getFeatureCounter());
-						// }
-						// mariaOp.resetFeatureCounter();
-						// }
 					}
 
 				});
+
+				System.out.println(System.currentTimeMillis() - startime);
 			}
 		});
 		ssc.start();
