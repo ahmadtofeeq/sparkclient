@@ -82,7 +82,7 @@ public class MariaDB extends SparkUtils implements DBkeys {
 					response = ErrorType.ERROR_INSERTING_DB;
 				}
 			} else {
-				try {
+				/*try {
 					String queryUpdate = "update " + harmanDevice + " set " + FirmwareVersion + "= '"
 							+ mHarmanDeviceModel.getFirmwareVersion() + "'," + AppVersion + " = '"
 							+ mHarmanDeviceModel.getAppVersion() + "' where " + macAddress + " = '"
@@ -92,7 +92,7 @@ public class MariaDB extends SparkUtils implements DBkeys {
 						response = ErrorType.ERROR_UPDATING_DB;
 				} catch (SQLException se) {
 					response = ErrorType.ERROR_UPDATING_DB;
-				}
+				}*/
 			}
 		} catch (Exception e) {
 			response = ErrorType.NETWORK_NOT_AVAILBLE;
