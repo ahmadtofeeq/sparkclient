@@ -22,7 +22,7 @@ import com.harman.dbinsertion.MariadbOperator;
 import com.harman.dbinsertion.MongoDBOperator;
 import com.harman.models.DBkeys;
 
-public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
+public class SparkCustomReceiverNoMariaDB extends Receiver<String> implements DBkeys {
 
 	/**
 	* 
@@ -32,7 +32,7 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 	String host = null;
 	int port = -1;
 
-	public SparkCustomReceiver(String host_, int port_) {
+	public SparkCustomReceiverNoMariaDB(String host_, int port_) {
 		super(StorageLevel.MEMORY_AND_DISK_2());
 		host = host_;
 		port = port_;
@@ -48,14 +48,13 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 				.set("spark.driver.memory", "2g");
 		System.out.println("1");
 		JavaStreamingContext ssc = new JavaStreamingContext(sparkConf, new Duration(1000));
-		JavaDStream<String> socket_one = ssc.receiverStream(new SparkCustomReceiver("52.165.145.168", 9997));
+		JavaDStream<String> socket_one = ssc.receiverStream(new SparkCustomReceiverNoMariaDB("52.165.145.168", 9997));
 		socket_one.foreachRDD(new VoidFunction<JavaRDD<String>>() {
 
 			private static final long serialVersionUID = 1L;
 
 			public void call(JavaRDD<String> rdd) throws Exception {
 
-//				final long count = rdd.count();
 				
 				JavaRDD<String> filterrdd = rdd.filter(new Function<String, Boolean>() {
 
@@ -112,8 +111,8 @@ public class SparkCustomReceiver extends Receiver<String> implements DBkeys {
 						mongoOp.openConnection();
 						mongoOp.inserSingleRecordMongoDB(s);
 
-						MariadbOperator mariaOp = MariadbOperator.getInstance();
-						mariaOp.insertIntoMariaDB(s);
+//						MariadbOperator mariaOp = MariadbOperator.getInstance();
+//						mariaOp.insertIntoMariaDB(s);
 					}
 
 				});
